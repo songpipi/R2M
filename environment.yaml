@@ -95,5 +95,5 @@ dependencies:
   - wcwidth==0.1.7
   - werkzeug==0.15.5
   - wrapt==1.11.2
-prefix: !!python/unicode '/data/songpeipei/conda2/envs/tf12py2'
+prefix: !!python/unicode '/data/workspace/conda2/envs/tf12py2'
 
