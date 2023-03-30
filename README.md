@@ -1,9 +1,8 @@
 # Recurrent Relational Memory Network for Unsupervised Image Captioning
 
-====================================
 
 
-![alt text](https://github.com/songpipi/R2M/blob/master/image/framework.png)
+![alt text](./image/framework.png)
 <p align="center">The overall framework of R2M.</p>
 
 
