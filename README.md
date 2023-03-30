@@ -3,7 +3,7 @@
 ====================================
 
 
-![alt text](https://github.com/songpipi/R2M/image/framework.png)
+![alt text](https://github.com/songpipi/R2M/blob/master/image/framework.png)
 <p align="center">The overall framework of R2M.</p>
 
 
@@ -28,6 +28,7 @@ Requirements
 * CUDA 9.0
 * cuDNN 7.0.5
 * Java 8
+* Sonnet 1.34
 * Python 2.7.13
   * Tensorflow 1.12.0
   * Other python packages specified in environment.yaml
@@ -37,30 +38,39 @@ Prepare Data
 ----------------------
 1. Download the Shutterstock/MSCOCO/GCC descriptions from [link](https://www.shutterstock.com/)/[link](http://cocodataset.org/)/[link](https://ai.google.com/research/ConceptualCaptions/download).
 
-2. Preprocess the descriptions. 
+2. Extract the descriptions. It seems that NLTK is changing constantly. So 
+the number of the descriptions obtained may be different.
+    ```
+    python -c "import nltk; nltk.download('punkt')"
+    python preprocessing/extract_descriptions.py
+    ```
+    
+3. Preprocess the descriptions. 
     ```
     python preprocessing/process_descriptions.py --word_counts_output_file \ 
       data/word_counts.txt --new_dict
+    ```
 
-3. Download the MSCOCO/Flickr30k images from [link](http://cocodataset.org/)/[link](http://shannon.cs.illinois.edu/DenotationGraph/data/index.html).
+4. Download the MSCOCO/Flickr30k images from [link](http://cocodataset.org/)/[link](http://shannon.cs.illinois.edu/DenotationGraph/data/index.html).
 
-4. Object detection for the training images. You need to first download the
+5. Object detection for the training images. You need to first download the
 detection model from [here][detection_model] and then extract the model under
 tf_models/research/object_detection.
     ```
     python preprocessing/detect_objects.py --image_path\
       ~/dataset/mscoco/all_images --num_proc 2 --num_gpus 1
-
-5. Generate tfrecord files for images.
+    ```
+    
+6. Generate tfrecord files for images.
     ```
     python preprocessing/process_images.py --image_path\
       ~/dataset/mscoco/all_images
     ```
 
  *You can skip step 1-2 and download below files*
-* MSCOCO\leftrightarrowShutterstock: https://drive.google.com/drive/folders/1ay0o0gUe2iaUQScIwoVjv8Nj3KdBp18f
-* Flickr30k\leftrightarrowMSCOCO: https://drive.google.com/drive/folders/1cIo1O1-_TypJdTAY1p1q3cMwzTPL_4W6
-* MSCOCO\leftrightarrowGCC: https://drive.google.com/drive/folders/1Ih4XHaQ1zJ85d4p_hciwzXXtiXARYL2g
+* MSCOCO-Shutterstock: https://drive.google.com/drive/folders/1ay0o0gUe2iaUQScIwoVjv8Nj3KdBp18f
+* Flickr30k-MSCOCO: https://drive.google.com/drive/folders/1cIo1O1-_TypJdTAY1p1q3cMwzTPL_4W6
+* MSCOCO-GCC: https://drive.google.com/drive/folders/1Ih4XHaQ1zJ85d4p_hciwzXXtiXARYL2g
 
 
 Training
@@ -69,27 +79,27 @@ Training
 * Supervision Learning on Text Corpus
 1. Train the model with only cross-entropy loss
 ```
-python train/obj2sen_xe.py
+python obj2sen_xe.py
 ```
 2. Fine-tune the model with cross-entropy loss and reconstruction loss
 ```
-python train/obj2sen_xe+rec.py
+python obj2sen_xe+rec.py
 ```
 
 * Unsupervised Visual Alignment on Images
 3. Fine-tune the model with triplet ranking loss
 ```
-python train/obj2sen_tri.py
+python obj2sen_tri.py
 ```
 4. Fine-tune the model with triplet ranking loss and reconstruction loss
 ```
-python train/obj2sen_tri+rec.py
+python obj2sen_tri+rec.py
 ```
 
 *Pretrained Models - R2M*
-* MSCOCO\leftrightarrowShutterstock: https://drive.google.com/drive/folders/1Nqy0Gohhu33k8cgWwRNvISuSu01nWX5u
-* Flickr30k\leftrightarrowMSCOCO: https://drive.google.com/drive/folders/1JUH2_Aq7u9mwik9maHOKclnjOVqXo1Q9
-* MSCOCO\leftrightarrowGCC: https://drive.google.com/drive/folders/13BM7PYQMfYaQ6WXMvz9_u0NgotCktydR
+* MSCOCO-Shutterstock: https://drive.google.com/drive/folders/1Nqy0Gohhu33k8cgWwRNvISuSu01nWX5u
+* Flickr30k-MSCOCO: https://drive.google.com/drive/folders/1JUH2_Aq7u9mwik9maHOKclnjOVqXo1Q9
+* MSCOCO-GCC: https://drive.google.com/drive/folders/13BM7PYQMfYaQ6WXMvz9_u0NgotCktydR
 
 
 Evaluation
@@ -97,7 +107,7 @@ Evaluation
 
 Evaluation of a trained model checkpoint can be done as follows:
 ```
-python eval/test_obj2sen.py --job_dir [path_to_root]/save/XXXXX.pth
+python test_obj2sen.py --job_dir [path_to_root]/save/XXXXX.pth
 ```
 
 Acknowledgements
