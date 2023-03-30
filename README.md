@@ -25,7 +25,7 @@ Requirements
 
 Prepare Data
 ----------------------
-1. Download the MSCOCO/GCC descriptions from [here](http://cocodataset.org/)/[here](https://ai.google.com/research/ConceptualCaptions/download). Download the Shutterstock descriptions by running:
+1. Download the MSCOCO or GCC descriptions from [here](http://cocodataset.org/) or [here](https://ai.google.com/research/ConceptualCaptions/download). Or download the Shutterstock descriptions by running:
     ```
     python preprocessing/crawl_descriptions.py
     ```
@@ -41,7 +41,7 @@ Prepare Data
     python preprocessing/process_descriptions.py --word_counts_output_file data/word_counts.txt --new_dict
     ```
 
-4. Download the MSCOCO/Flickr30k images from [here](http://cocodataset.org/)/[here](http://shannon.cs.illinois.edu/DenotationGraph/data/index.html) and put 
+4. Download the MSCOCO or Flickr30k images from [here](http://cocodataset.org/) or [here](http://shannon.cs.illinois.edu/DenotationGraph/data/index.html) and put 
 all the images into data/[dataset]/images.
 
 5. Object detection for the training images. You need to first download the
@@ -60,6 +60,7 @@ tf_models/research/object_detection.
 * MSCOCO-Shutterstock: https://drive.google.com/drive/folders/1ay0o0gUe2iaUQScIwoVjv8Nj3KdBp18f
 * Flickr30k-MSCOCO: https://drive.google.com/drive/folders/1cIo1O1-_TypJdTAY1p1q3cMwzTPL_4W6
 * MSCOCO-GCC: https://drive.google.com/drive/folders/1Ih4XHaQ1zJ85d4p_hciwzXXtiXARYL2g
+
 
 
 Training
@@ -86,10 +87,20 @@ python obj2sen_tri.py --job_dir checkpoints/step3 --obj2sen_ckpt checkpoints/ste
 python obj2sen_tri+rec.py --job_dir checkpoints/step4 --obj2sen_ckpt checkpoints/step3/model.ckpt-XXX
 ```
 
+
+**Note:** For simplicity, you can train the model in one step as follows, but this may result in different performance than in the paper.
+```
+python end2end.py --job_dir checkpoints/end2end.py
+```
+
+
 *Pretrained Models - R2M*
 * MSCOCO-Shutterstock: https://drive.google.com/drive/folders/1Nqy0Gohhu33k8cgWwRNvISuSu01nWX5u
 * Flickr30k-MSCOCO: https://drive.google.com/drive/folders/1JUH2_Aq7u9mwik9maHOKclnjOVqXo1Q9
 * MSCOCO-GCC: https://drive.google.com/drive/folders/13BM7PYQMfYaQ6WXMvz9_u0NgotCktydR
+
+
+
 
 
 Evaluation
