@@ -9,17 +9,7 @@
 
 This is a Tensorflow implementation for [Recurrent Relational Memory Network for Unsupervised Image Captioning, IJCAI2020](https://arxiv.org/abs/2006.13611).
 
-If you use this code in your research, please consider citing:
 
-```text
-@InProceedings{Guo_2020_IJCAI,
-author = {Guo, Dan and Wang, Yang and Song, Peipei and Wang, Meng},
-title = {Recurrent relational memory network for unsupervised image captioning},
-booktitle = {International Joint Conference on Artificial Intelligence (IJCAI)},
-month = {January},
-year = {2021}
-}
-```
 
 Requirements
 ----------------------
@@ -35,10 +25,12 @@ Requirements
 
 Prepare Data
 ----------------------
-1. Download the Shutterstock/MSCOCO/GCC descriptions from [link](https://www.shutterstock.com/)/[link](http://cocodataset.org/)/[link](https://ai.google.com/research/ConceptualCaptions/download).
+1. Download the MSCOCO/GCC descriptions from [here](http://cocodataset.org/)/[here](https://ai.google.com/research/ConceptualCaptions/download). Download the Shutterstock descriptions by running:
+    ```
+    python preprocessing/crawl_descriptions.py
+    ```
 
-2. Extract the descriptions. It seems that NLTK is changing constantly. So 
-the number of the descriptions obtained may be different.
+2. Extract the descriptions. 
     ```
     python -c "import nltk; nltk.download('punkt')"
     python preprocessing/extract_descriptions.py
@@ -46,27 +38,25 @@ the number of the descriptions obtained may be different.
     
 3. Preprocess the descriptions. 
     ```
-    python preprocessing/process_descriptions.py --word_counts_output_file \ 
-      data/word_counts.txt --new_dict
+    python preprocessing/process_descriptions.py --word_counts_output_file data/word_counts.txt --new_dict
     ```
 
-4. Download the MSCOCO/Flickr30k images from [link](http://cocodataset.org/)/[link](http://shannon.cs.illinois.edu/DenotationGraph/data/index.html).
+4. Download the MSCOCO/Flickr30k images from [here](http://cocodataset.org/)/[here](http://shannon.cs.illinois.edu/DenotationGraph/data/index.html) and put 
+all the images into data/[dataset]/images.
 
 5. Object detection for the training images. You need to first download the
 detection model from [here][detection_model] and then extract the model under
 tf_models/research/object_detection.
     ```
-    python preprocessing/detect_objects.py --image_path\
-      ~/dataset/mscoco/all_images --num_proc 2 --num_gpus 1
+    python preprocessing/detect_objects.py --image_path data/[dataset]/images --num_proc 2 --num_gpus 1
     ```
     
 6. Generate tfrecord files for images.
     ```
-    python preprocessing/process_images.py --image_path\
-      ~/dataset/mscoco/all_images
+    python preprocessing/process_images.py --image_path data/[dataset]/images
     ```
 
- *You can skip step 1-2 and download below files*
+ *You can skip step 1-3 and download below files*
 * MSCOCO-Shutterstock: https://drive.google.com/drive/folders/1ay0o0gUe2iaUQScIwoVjv8Nj3KdBp18f
 * Flickr30k-MSCOCO: https://drive.google.com/drive/folders/1cIo1O1-_TypJdTAY1p1q3cMwzTPL_4W6
 * MSCOCO-GCC: https://drive.google.com/drive/folders/1Ih4XHaQ1zJ85d4p_hciwzXXtiXARYL2g
@@ -74,25 +64,26 @@ tf_models/research/object_detection.
 
 Training
 --------
+You can change some settings by modifying `config.py`.
 
 * Supervision Learning on Text Corpus
 1. Train the model with only cross-entropy loss
 ```
-python obj2sen_xe.py
+python obj2sen_xe.py --job_dir checkpoints/step1
 ```
 2. Fine-tune the model with cross-entropy loss and reconstruction loss
 ```
-python obj2sen_xe+rec.py
+python obj2sen_xe+rec.py --job_dir checkpoints/step2 --obj2sen_ckpt checkpoints/step1/model.ckpt-XXX
 ```
 
 * Unsupervised Visual Alignment on Images
 3. Fine-tune the model with triplet ranking loss
 ```
-python obj2sen_tri.py
+python obj2sen_tri.py --job_dir checkpoints/step3 --obj2sen_ckpt checkpoints/step2/model.ckpt-XXX
 ```
 4. Fine-tune the model with triplet ranking loss and reconstruction loss
 ```
-python obj2sen_tri+rec.py
+python obj2sen_tri+rec.py --job_dir checkpoints/step4 --obj2sen_ckpt checkpoints/step3/model.ckpt-XXX
 ```
 
 *Pretrained Models - R2M*
@@ -104,10 +95,23 @@ python obj2sen_tri+rec.py
 Evaluation
 ----------
 
-Evaluation of a trained model checkpoint can be done as follows:
 ```
-python test_obj2sen.py --job_dir [path_to_root]/save/XXXXX.pth
+python test_obj2sen.py --job_dir checkpoints/step4/model.ckpt-XXX --vocab_file data/word_counts.txt
 ```
+
+Citation
+----------------
+If you use this code in your research, please consider citing:
+
+```text
+@InProceedings{guo2020recurrent,
+title = {Recurrent relational memory network for unsupervised image captioning},
+author = {Guo, Dan and Wang, Yang and Song, Peipei and Wang, Meng},
+booktitle = {International Joint Conference on Artificial Intelligence (IJCAI)},
+year = {2020}
+}
+```
+
 
 Acknowledgements
 ----------------
